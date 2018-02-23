@@ -19871,6 +19871,8 @@ function WebVRManager( renderer ) {
 	}
 
 	var matrixWorldInverse = new Matrix4();
+	var tempQuaternion = new Quaternion();
+	var tempPosition = new Vector3();
 
 	var cameraL = new PerspectiveCamera();
 	cameraL.bounds = new Vector4( 0.0, 0.0, 0.5, 1.0 );
@@ -19949,25 +19951,6 @@ function WebVRManager( renderer ) {
 
 		//
 
-		var pose = frameData.pose;
-		var poseObject = poseTarget !== null ? poseTarget : camera;
-
-		if ( pose.position !== null ) {
-
-			poseObject.position.fromArray( pose.position );
-
-		} else {
-
-			poseObject.position.set( 0, 0, 0 );
-
-		}
-
-		if ( pose.orientation !== null ) {
-
-			poseObject.quaternion.fromArray( pose.orientation );
-
-		}
-
 		var stageParameters = device.stageParameters;
 
 		if ( stageParameters ) {
@@ -19980,8 +19963,36 @@ function WebVRManager( renderer ) {
 
 		}
 
-		poseObject.position.applyMatrix4( standingMatrix );
+
+		var pose = frameData.pose;
+		var poseObject = poseTarget !== null ? poseTarget : camera;
+
+		// We want to manipulate poseObject by its position and quaternion components since users may rely on them.
+		poseObject.matrix.copy( standingMatrix );
+		poseObject.matrix.decompose(poseObject.position, poseObject.quaternion, poseObject.scale);
+
+		if ( pose.orientation !== null ) {
+
+			tempQuaternion.fromArray ( pose.orientation );
+			poseObject.quaternion.multiply( tempQuaternion );
+
+		}
+
+		if ( pose.position !== null ) {
+
+			tempQuaternion.setFromRotationMatrix(standingMatrix);
+			tempPosition.fromArray( pose.position );
+			tempPosition.applyQuaternion(tempQuaternion);
+			poseObject.position.add( tempPosition );
+
+		} else {
+
+			poseObject.position.set( 0, 0, 0 );
+
+		}
+
 		poseObject.updateMatrixWorld();
+
 
 		if ( device.isPresenting === false ) return camera;
 
