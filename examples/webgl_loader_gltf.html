@@ -39,6 +39,7 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -51,7 +52,7 @@
 			var camera, scene, renderer, light;
 
 			init();
-			animate();
+			renderer.setAnimationLoop( animate );
 
 			function init() {
 
@@ -75,7 +76,7 @@
 				] );
 
 				scene = new THREE.Scene();
-				scene.background = envMap;
+				// scene.background = envMap;
 
 				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
 				light.position.set( 0, 1, 0 );
@@ -95,15 +96,21 @@
 
 					} );
 
+					gltf.scene.scale.setScalar(0.2);
+					gltf.scene.position.y = 1.5;
+					gltf.scene.position.z = -1;
 					scene.add( gltf.scene );
 
 				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				// renderer.gammaOutput = true;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -125,8 +132,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

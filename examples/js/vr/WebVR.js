@@ -9,6 +9,15 @@ var WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
+		var xrCanvas = document.createElement( 'canvas' );
+		xrCanvas.width = window.innerWidth;
+		xrCanvas.height = window.innerHeight;
+		xrCanvas.style.position = 'absolute';
+		xrCanvas.style.top = 0;
+		xrCanvas.style.left = 0;
+		document.body.appendChild( xrCanvas );
+		var xrContext = xrCanvas.getContext( 'xrpresent' );
+
 		function showEnterVR( device ) {
 
 			button.style.display = '';
@@ -45,6 +54,7 @@ var WEBVR = {
 
 				renderer.vr.setSession( session, options );
 				button.textContent = 'EXIT XR';
+				xrCanvas.style.display = 'block';
 
 				currentSession = session;
 
@@ -56,6 +66,7 @@ var WEBVR = {
 
 				renderer.vr.setSession( null );
 				button.textContent = 'ENTER XR';
+				xrCanvas.style.display = 'none';
 
 				currentSession = null;
 
@@ -78,7 +89,7 @@ var WEBVR = {
 
 				if ( currentSession === null ) {
 
-					device.requestSession( { immersive: true } ).then( onSessionStarted );
+					device.requestSession( { requestAR: true, outputContext: xrContext } ).then( onSessionStarted );
 
 				} else {
 
@@ -137,7 +148,7 @@ var WEBVR = {
 
 			navigator.xr.requestDevice().then( function ( device ) {
 
-				device.supportsSession( { immersive: true } ).then( function () {
+				device.supportsSession( { requestAR: true, outputContext: xrContext } ).then( function () {
 
 					showEnterXR( device );
 

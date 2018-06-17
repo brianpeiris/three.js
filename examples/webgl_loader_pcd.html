@@ -47,6 +47,7 @@
 
 
 		<script src="../build/three.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 		<script src="js/loaders/PCDLoader.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/Detector.js"></script>
@@ -60,16 +61,16 @@
 			var camera, controls, scene, renderer;
 
 			init();
-			animate();
+			renderer.setAnimationLoop(animate);
+
 			function init() {
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
+				// scene.background = new THREE.Color( 0x000000 );
 
 				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
 				camera.position.x = 0.4;
 				camera.position.z = -2;
-				camera.up.set(0,0,1);
 
 				controls = new THREE.TrackballControls( camera );
 
@@ -92,9 +93,18 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+				renderer.autoClear = false;
+				renderer.vr.enabled = true;
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				var loader = new THREE.PCDLoader();
 				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( mesh ) {
+
+					mesh.rotation.z = Math.PI;
+					mesh.rotation.y = Math.PI;
+					mesh.position.x = -1;
+					mesh.position.y = 3.5;
+					mesh.scale.setScalar(3);
 
 					scene.add( mesh );
 					var center = mesh.geometry.boundingSphere.center;
@@ -152,7 +162,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
 				controls.update();
 				renderer.render( scene, camera );
 				stats.update();

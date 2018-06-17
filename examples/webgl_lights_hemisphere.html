@@ -46,6 +46,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -104,8 +105,8 @@
 				camera.position.set( 0, 0, 250 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
-				scene.fog = new THREE.Fog( scene.background, 1, 5000 );
+				// scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
+				// scene.fog = new THREE.Fog( scene.background, 1, 5000 );
 
 				// LIGHTS
 
@@ -153,7 +154,7 @@
 				var ground = new THREE.Mesh( groundGeo, groundMat );
 				ground.rotation.x = -Math.PI/2;
 				ground.position.y = -33;
-				scene.add( ground );
+				// scene.add( ground );
 
 				ground.receiveShadow = true;
 
@@ -169,13 +170,13 @@
 				};
 				uniforms.topColor.value.copy( hemiLight.color );
 
-				scene.fog.color.copy( uniforms.bottomColor.value );
+				// scene.fog.color.copy( uniforms.bottomColor.value );
 
 				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
 				var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
 
 				var sky = new THREE.Mesh( skyGeo, skyMat );
-				scene.add( sky );
+				// scene.add( sky );
 
 				// MODEL
 
@@ -186,9 +187,10 @@
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, flatShading: true } );
 					var mesh = new THREE.Mesh( geometry, material );
 
-					var s = 0.35;
+					var s = 0.005;
 					mesh.scale.set( s, s, s );
-					mesh.position.y = 15;
+					mesh.position.y = 1.5;
+					mesh.position.z = -2;
 					mesh.rotation.y = -1;
 
 					mesh.castShadow = true;
@@ -205,9 +207,12 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
@@ -259,10 +264,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
+				renderer.setAnimationLoop( render );
 
 			}
 
@@ -277,6 +279,8 @@
 				}
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

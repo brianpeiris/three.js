@@ -149,6 +149,7 @@ function WebXRManager( renderer ) {
 	function onAnimationFrame( time, frame ) {
 
 		pose = frame.getDevicePose( frameOfRef );
+		if ( ! pose ) return;
 
 		var layer = session.baseLayer;
 		var views = frame.views;
