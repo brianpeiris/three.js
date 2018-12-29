@@ -67,7 +67,7 @@ var WEBVR = {
 
 			}
 
-			function onSessionEnded( ) {
+			function onSessionEnded( event ) {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
