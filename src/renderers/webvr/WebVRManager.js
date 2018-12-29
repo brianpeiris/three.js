@@ -179,6 +179,8 @@ function WebVRManager( renderer ) {
 
 	this.enabled = false;
 
+	this.resetToUserHeight = true;
+
 	this.getController = function ( id ) {
 
 		var controller = controllers[ id ];
@@ -235,7 +237,12 @@ function WebVRManager( renderer ) {
 
 		if ( device === null ) {
 
-			camera.position.set( 0, userHeight, 0 );
+			if ( this.resetToUserHeight ) {
+
+				camera.position.set( 0, userHeight, 0 );
+
+			}
+
 			return camera;
 
 		}
